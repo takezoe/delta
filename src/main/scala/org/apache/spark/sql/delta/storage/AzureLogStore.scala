@@ -17,11 +17,12 @@
 package org.apache.spark.sql.delta.storage
 
 import java.io.FileNotFoundException
+import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.FileAlreadyExistsException
 import java.util.UUID
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path, RawLocalFileSystem}
+import org.apache.hadoop.fs.{FileSystem, Path}
 
 import org.apache.spark.SparkConf
 
@@ -50,7 +51,7 @@ class AzureLogStore(sparkConf: SparkConf, hadoopConf: Configuration)
     if (overwrite) {
       val stream = fs.create(path, true)
       try {
-        actions.map(_ + "\n").map(_.getBytes("utf-8")).foreach(stream.write)
+        actions.map(_ + "\n").map(_.getBytes(UTF_8)).foreach(stream.write)
       } finally {
         stream.close()
       }
@@ -63,7 +64,7 @@ class AzureLogStore(sparkConf: SparkConf, hadoopConf: Configuration)
       var renameDone = false // This flag is to save the delete operation in most of cases.
       val stream = fs.create(tempPath)
       try {
-        actions.map(_ + "\n").map(_.getBytes("utf-8")).foreach(stream.write)
+        actions.map(_ + "\n").map(_.getBytes(UTF_8)).foreach(stream.write)
         stream.close()
         streamClosed = true
         try {
